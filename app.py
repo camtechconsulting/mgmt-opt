@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from docx import Document
 from docx.shared import Inches
@@ -125,6 +125,10 @@ def add_logo(doc):
 @app.route('/')
 def home():
     return "Management Optimization Backend is Running!"
+
+@app.route('/static/reports/<path:filename>')
+def download_file(filename):
+    return send_from_directory(REPORT_FOLDER, filename, as_attachment=True)
 
 @app.route('/generate', methods=['POST'])
 def generate_report():
