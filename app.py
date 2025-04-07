@@ -17,16 +17,19 @@ def home():
 @app.route('/generate', methods=['POST'])
 def generate_report():
     try:
-        files = request.files.getlist("documents")
-        if not files:
+        file1 = request.files.get("file1")
+        file2 = request.files.get("file2")
+        file3 = request.files.get("file3")
+
+        if not file1 and not file2 and not file3:
             return jsonify({'error': 'No files uploaded'}), 400
 
         context = ""
-        for file in files:
-            context += f"--- {file.filename} ---\n"
-            context += file.read().decode(errors='ignore') + "\n"
+        for file in [file1, file2, file3]:
+            if file:
+                context += f"--- {file.filename} ---\n"
+                context += file.read().decode(errors='ignore') + "\n"
 
-        # Simulated analysis for demonstration purposes
         doc = Document()
         doc.add_heading("Management Optimization Report", 0)
         doc.add_paragraph("This report analyzes uploaded management documents to identify inefficiencies, patterns, and provides recommendations.\n")
@@ -35,11 +38,21 @@ def generate_report():
 
         filename = f"management_report_{datetime.now().strftime('%Y%m%d%H%M%S')}.docx"
         file_path = os.path.join(REPORT_FOLDER, filename)
-        doc.save(file_path)
+
+        # Save and verify
+        try:
+            doc.save(file_path)
+        except Exception as e:
+            return jsonify({'error': f'File save failed: {str(e)}'}), 500
+
+        # Check if saved
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'File not saved.'}), 500
 
         return jsonify({'download_url': f'/static/reports/{filename}'})
+
     except Exception as e:
-        return jsonify({'error': f"Failed to generate report: {str(e)}"}), 500
+        return jsonify({'error': f"Exception: {str(e)}"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
