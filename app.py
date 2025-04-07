@@ -29,19 +29,26 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate_report():
+    print(f"✅ Checking save path: {REPORT_FOLDER}")
+    if not os.path.exists(REPORT_FOLDER):
+        print("❌ REPORT_FOLDER does not exist!")
+    else:
+        print("✅ REPORT_FOLDER exists and is accessible.")
+
     doc = Document()
     add_logo(doc)
     doc.add_heading("Management Optimization Test Report", 0)
-    doc.add_paragraph("This is a test report. If you're seeing this, saving and downloading works!")
+    doc.add_paragraph("This is a test report with debug logging enabled.")
 
     filename = f"test_report_{datetime.now().strftime('%Y%m%d%H%M%S')}.docx"
     file_path = os.path.join(REPORT_FOLDER, filename)
+    print(f"📄 Intended file path: {file_path}")
 
     try:
         doc.save(file_path)
-        print(f"✅ Test report saved at: {file_path}")
+        print(f"✅ Successfully saved report at: {file_path}")
     except Exception as e:
-        print(f"❌ Error saving test report: {e}")
+        print(f"❌ Error saving report: {e}")
 
     return jsonify({'download_url': f'/static/reports/{filename}'})
 
