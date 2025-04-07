@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from docx import Document
 from docx.shared import Inches
-import fitz  # PDF
+import fitz
 import pandas as pd
 import os
 import re
@@ -15,14 +15,12 @@ app = Flask(__name__)
 CORS(app)
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-
 REPORT_FOLDER = os.path.join(app.root_path, 'static', 'reports')
 LOGO_PATH = os.path.join(app.root_path, 'static', 'logo.png')
 os.makedirs(REPORT_FOLDER, exist_ok=True)
 
 def extract_text_docx(file):
     try:
-        from docx import Document
         doc = Document(file)
         return "\n".join([para.text for para in doc.paragraphs if para.text.strip()])
     except Exception:
@@ -38,7 +36,7 @@ def extract_text_pdf(file):
 def extract_text_image(file):
     try:
         image = Image.open(file.stream)
-        return image.filename  # Placeholder for future OCR
+        return image.filename
     except Exception:
         return ""
 
@@ -97,11 +95,17 @@ def generate_section(prompt):
         response = openai.ChatCompletion.create(
             model="gpt-4-0125-preview",
             messages=[
-                {"role": "system", "content": "You are a management consultant writing clear and structured optimization reports for business owners. Include tables in Markdown where useful."},
-                {"role": "user", "content": prompt}
+                {
+                    "role": "system",
+                    "content": "You are a professional management consultant writing in-depth and strategic optimization reports. You analyze all types of files for leadership efficiency, workflow issues, and organizational improvements. Include Markdown tables where appropriate."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
             ],
             temperature=0.7,
-            max_tokens=1500
+            max_tokens=2000
         )
         return response['choices'][0]['message']['content']
     except Exception as e:
@@ -141,18 +145,18 @@ def generate_report():
     doc.add_heading('Management Metric Optimization Report', 0)
 
     sections = [
-        ("Executive Summary", "Summarize the current management practices and challenges."),
-        ("Leadership Efficiency", "Evaluate leadership effectiveness and decision-making quality. Recommend improvements."),
-        ("Workflow Processes", "Analyze workflow efficiency, communication, and coordination across teams."),
-        ("Organizational Structure", "Assess the clarity, hierarchy, and effectiveness of the org chart."),
-        ("Team Productivity", "Evaluate employee performance data and team dynamics. Recommend changes."),
-        ("Management Risks", "Identify management-level risks and suggest mitigations."),
-        ("Strategic Recommendations", "Give high-level recommendations to improve overall management."),
+        ("Executive Summary", "Write a 300+ word summary identifying the strengths and weaknesses of the current management structure."),
+        ("Leadership Efficiency", "Based on the documents, analyze leadership traits, communication style, and decision effectiveness. Recommend improvements."),
+        ("Workflow Processes", "Highlight bottlenecks, gaps in communication, and time management inefficiencies in current workflows."),
+        ("Organizational Structure", "Describe the org chart and whether team roles and responsibilities are clearly defined."),
+        ("Team Productivity", "Interpret productivity patterns from the documents. Recommend systems or changes to improve output."),
+        ("Management Risks", "List management-related risks and provide mitigation strategies."),
+        ("Strategic Recommendations", "Provide an extensive set of recommendations to enhance overall managerial efficiency and alignment with business goals.")
     ]
 
     for title, instruction in sections:
         doc.add_heading(title, level=1)
-        prompt = f"{instruction}\n\nBusiness Context:\n{context}"
+        prompt = f"{instruction}\n\nManagement Documentation Context:\n{context}"
         gpt_response = generate_section(prompt)
         table_data = extract_table_data(gpt_response)
         if table_data:
