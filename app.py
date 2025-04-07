@@ -48,8 +48,7 @@ def generate_report():
     for title, instruction in sections:
         doc.add_heading(title, level=1)
         doc.add_paragraph(f"(Section generated based on uploaded content and instruction: {instruction})")
-        doc.add_paragraph("Generated content here...
-")
+        doc.add_paragraph("Generated content here...")
 
     filename = f"management_report_{datetime.now().strftime('%Y%m%d%H%M%S')}.docx"
     file_path = os.path.join(REPORT_FOLDER, filename)
