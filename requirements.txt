@@ -9,3 +9,4 @@ pdfplumber
 pypdf2
 pandas
 docx2txt
+openpyxl>=3.0.10
