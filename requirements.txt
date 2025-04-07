@@ -1,12 +1,12 @@
 flask
 flask-cors
 python-docx
+docx2txt
+PyPDF2
+pdfplumber
+pandas
+openpyxl
 openai
 python-pptx
 pytesseract
 pillow
-pdfplumber
-pypdf2
-pandas
-docx2txt
-openpyxl>=3.0.10
