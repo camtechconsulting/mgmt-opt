@@ -179,7 +179,6 @@ def generate_report():
 
     filename = f"management_report_{datetime.now().strftime('%Y%m%d%H%M%S')}.docx"
     file_path = os.path.join(REPORT_FOLDER, filename)
-    try:
         doc.save(file_path)
         print(f"✅ Report successfully saved at {file_path}")
     except Exception as e:
